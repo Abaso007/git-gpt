@@ -15,8 +15,7 @@ CLONE_NEW_REPO = "Clone new repo"
 LOAD_EXISTING_INDEX = "Load existing index"
 
 def ask_for_repo():
-    repo_url = input("Enter repo url: ")
-    return repo_url
+    return input("Enter repo url: ")
 
 def clone_repo(repo_url):
     repo_tmp_path = os.path.join(temp.tempdir(), uuid.uuid4().hex)
@@ -46,7 +45,7 @@ def save_index(index, repo_url):
 
     # Save index
     date_str = datetime.datetime.now().strftime("%m-%H-%d-%m-%Y")
-    name = get_repo_name(repo_url) + "-" + date_str + ".json"
+    name = f"{get_repo_name(repo_url)}-{date_str}.json"
     index.save_to_disk(os.path.join(STORE_DIR, name))
 
 def start_asking(index):
@@ -84,21 +83,13 @@ def existing_repo_flow():
     for file in os.listdir(STORE_DIR):
         print(file)
 
-    # Ask user to select index
-    files_array = []
-
-    for file in os.listdir(STORE_DIR):
-        files_array.append(file)
-
+    files_array = list(os.listdir(STORE_DIR))
     answer = inquirer.prompt(
         [inquirer.List("index", message="Select index", choices=files_array)]
     )
     index_path = os.path.join(STORE_DIR, answer["index"])
 
-    # Load index
-    index = GPTSimpleVectorIndex.load_from_disk(index_path)
-
-    return index
+    return GPTSimpleVectorIndex.load_from_disk(index_path)
 
 def main():
     # Declare index
